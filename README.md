@@ -15,6 +15,7 @@ Connect
 - DHT22 pin 1 (Vcc) to Arduino 3.3V
 - DHT22 pin 2 (Signal) to Arduino pin 7 (DHT22_DATA)
 - DHT22 pin 3 and 4 to Arduino GND.  Both pins are grounded because some versions of the DHT22 expect ground on pin 3 instead of pin 4.
+- A 1K pull-up resistor between DHT22 pins 2 and 1.
 
 ## To use
 Values can be read using any device with appropriate BLE software and hardware.
