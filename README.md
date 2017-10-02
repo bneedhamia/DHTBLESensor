@@ -12,7 +12,7 @@ The Sketch is based on Intel's CurieBLE examples and Rob Tillaart's DHT22 librar
 DHT22/RHT03 wiring is available at the Sparkfun link above.
 
 Connect
-- DHT22 pin 1 (Vcc) to Arduino 3.3V
+- DHT22 pin 1 (Vcc) to Arduino 5V. The DHT22 is a 5V part (not a 3.3V part)
 - DHT22 pin 2 (Signal) to Arduino pin 7 (DHT22_DATA)
 - DHT22 pin 3 and 4 to Arduino GND.  Both pins are grounded because some versions of the DHT22 expect ground on pin 3 instead of pin 4.
 - Not required, because we use the Arduino internal pull-up resistor instead: A 1K pull-up resistor between DHT22 pins 2 and 1.
