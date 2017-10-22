@@ -32,6 +32,8 @@
  *     
  *   PIN_CONNECTED_LED = Output. HIGH (lighted) if somebody is connected to our BLE Service.
  *   
+ *   Connect a 4.7K ohm resistor between DHT22 pin 2 and Arduino 5V.
+ *   
  */
 const int PIN_CONNECTED_LED = 13;
 const int DHT22_DATA = 7;
@@ -56,7 +58,7 @@ void setup() {
   
   pinMode(PIN_CONNECTED_LED, OUTPUT);   // initially we're not connected to anyone.
   digitalWrite(PIN_CONNECTED_LED, LOW);
-  pinMode(DHT22_DATA, INPUT);
+  // DHT22_DATA is managed by the DHT library.
 
   // Configure the BLE stack
   myBLE.setLocalName(BLE_LOCAL_NAME);
