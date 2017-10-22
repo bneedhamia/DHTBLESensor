@@ -3,7 +3,7 @@
  * Based on Intel's CurieBLE Battery Monitor Example (LGPL)
  * and on Rob Tillaart's DHT library (Public Domain) http://playground.arduino.cc/Main/DHTLib
  * 
- * Copyright (c) 2016 Bradford Needham
+ * Copyright (c) 2016, 2017 Bradford Needham
  * { @bneedhamia , https://www.needhamia.com, https://github.com/bneedhamia }
  *
  * Licensed under LGPL 2.1 (to match the CurieBLE example),
@@ -19,12 +19,13 @@
  * RHT03 parts and datasheets are available from Sparkfun: https://www.sparkfun.com/products/10167
  * Male/Female jumper wires for connecting the RHT02 (DHT22) are available from Sparkfun: https://www.sparkfun.com/products/9140
  */
-#include <CurieBle.h>
+#include <CurieBLE.h>
 #include <dht.h> // DHT22 library, modified for Arduino 101.  Source at https://github.com/bneedhamia/DHT
 
 /*
  * Pins:
- *   DHT22 pin 1 --> power input, connected to Arduino 3.3V
+ *   DHT22 pin 1 --> power input, connected to Arduino 5V
+ *     Pin 1 is the left pin as the open grid faces you and the pins point down.
  *   DHT22 pin 2 --> signal output to Arduino (connect to DHT22_DATA)
  *   DHT22 pin3 & 4 --> Arduino GND. Both 3 and 4 are grounded because
  *     some DHT22's expect pin 3 to be grounded, while others expect pin 4 to be grounded.
@@ -84,7 +85,7 @@ void loop() {
     //XXX change this into a state machine.
     while (central.connected()) {  //XXX Not a good idea because connecting hangs all other Arduino functions (like reset and download)
       long nowMs = millis();
-      if (nowMs - whenSensedMs >= TEMPERATURE_UPDATE_INTERVAL_MS) {        
+      if ((long)(nowMs - whenSensedMs) >= TEMPERATURE_UPDATE_INTERVAL_MS) {        
         readTemperatureAndHumidity();
         setBLETemperatureAndHumidity(dht22.temperature, dht22.humidity);
       }
