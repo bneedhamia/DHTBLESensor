@@ -91,9 +91,12 @@ dht dht22;
 /*
    Sketch running state variables:
 
+   bleConnected = true if a BLE device is connected to us; false otherwise.
+   
    whenSensedMs = time (millis()) when the sensor was last read
      and the Temperature and Humidity sent via BLE.
 */
+boolean bleConnected = false;
 long whenSensedMs = 0;
 
 // Called automatically on Reset
@@ -125,29 +128,34 @@ void setup() {
 // Automatically called very often, after setup()
 void loop() {
   BLECentral central = myBLE.central();
-
-  if (central) {
-    digitalWrite(PIN_CONNECTED_LED, HIGH);
-
-    Serial.print("Connected to central: ");
-    Serial.println(central.address());
-
-    //XXX change this into a state machine.
-    while (central.connected()) {  //XXX Not a good idea because connecting hangs all other Arduino functions (like reset and download)
-      long nowMs = millis();
-      if ((long)(nowMs - whenSensedMs) >= TEMPERATURE_UPDATE_INTERVAL_MS) {
-        whenSensedMs = nowMs;
-        if (readTemperatureAndHumidity()) {
-          setBLETemperatureAndHumidity(dht22.temperature, dht22.humidity);
-        }
-      }
+  long nowMs;
+  
+  // Note the comings and goings of BLE clients (Centrals)
+  if (central && central.connected()) {
+    if (!bleConnected) {
+      bleConnected = true;
+      digitalWrite(PIN_CONNECTED_LED, HIGH);
+      Serial.print("Connected to central: ");
+      Serial.println(central.address());
     }
-    // Disconnected
 
-    digitalWrite(PIN_CONNECTED_LED, LOW);
+    // If we wanted to do something only while connected, we'd do it here.
+    
+  } else {
+    if (bleConnected) {
+      bleConnected = false;
+      digitalWrite(PIN_CONNECTED_LED, LOW);
+      Serial.println("Disconnected from central.");
+    }
+  }
 
-    Serial.print("Disconnected from central: ");
-    Serial.println(central.address());
+  // Periodically read the sensor, regardless of whether anyone's listening.
+  nowMs = millis();
+  if ((long)(nowMs - whenSensedMs) >= TEMPERATURE_UPDATE_INTERVAL_MS) {
+    whenSensedMs = nowMs;
+    if (readTemperatureAndHumidity()) {
+      setBLETemperatureAndHumidity(dht22.temperature, dht22.humidity);
+    }
   }
 }
 
