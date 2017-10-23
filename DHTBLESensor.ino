@@ -113,7 +113,8 @@ void setup() {
   myBLE.addAttribute(bleTemperatureC);
 
   // Initialize our BLE Characteristics
-  readTemperatureAndHumidity();
+  whenSensedMs = millis();
+  (void) readTemperatureAndHumidity();
   setBLETemperatureAndHumidity(dht22.temperature, dht22.humidity);
 
   // Because of Curie startup, no serial output will be seen until the loop.
@@ -135,8 +136,10 @@ void loop() {
     while (central.connected()) {  //XXX Not a good idea because connecting hangs all other Arduino functions (like reset and download)
       long nowMs = millis();
       if ((long)(nowMs - whenSensedMs) >= TEMPERATURE_UPDATE_INTERVAL_MS) {
-        readTemperatureAndHumidity();
-        setBLETemperatureAndHumidity(dht22.temperature, dht22.humidity);
+        whenSensedMs = nowMs;
+        if (readTemperatureAndHumidity()) {
+          setBLETemperatureAndHumidity(dht22.temperature, dht22.humidity);
+        }
       }
     }
     // Disconnected
@@ -153,18 +156,12 @@ void loop() {
    updating the corresponding global variables and
    the time of the reading.
 
-   If not enough time has passed since the last reading,
-   the sensor will not be read and the values will not be changed.
+   Returns true if the sensor responded correctly; false if an error occurred.
 */
-void readTemperatureAndHumidity() {
-  long nowMs = millis();
-  if (nowMs - whenSensedMs < TEMPERATURE_UPDATE_INTERVAL_MS) {
-    return;   // not ready to be read yet.
-  }
-  whenSensedMs = nowMs;
-
-  int result = dht22.read22(DHT22_DATA);
-
+boolean readTemperatureAndHumidity() {
+  int result;
+  
+  result = dht22.read22(DHT22_DATA);
   if (result != DHTLIB_OK) {
     if (result == DHTLIB_ERROR_TIMEOUT) {
       Serial.println("Timeout waiting for DHT22");
@@ -173,10 +170,11 @@ void readTemperatureAndHumidity() {
     } else {
       Serial.println("Unknown failure from DHT22");
     }
-    return; // try again later.
+    return false; // try again later.
   }
 
   // Cached results are now available in dht22.humidity and dht22.temperature
+  return true;
 }
 
 /*
