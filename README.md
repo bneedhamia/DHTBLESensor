@@ -2,6 +2,8 @@
 # DHTBLESensor
 Arduino 101 Sketch to deliver temperature and humidity from a DHT22/RHT03 sensor over BLE.
 
+NOTE: Intel discontinued the Arduino 101 (Curie) board in 2017, so this project is obsolete.
+
 The Sketch is based on Intel's CurieBLE examples and Rob Tillaart's DHT22 library example.
 
 ## Parts
